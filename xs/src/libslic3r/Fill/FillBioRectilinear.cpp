@@ -28,8 +28,8 @@ FillRectilinear::_fill_single_direction(ExPolygon expolygon,
     expolygon.rotate(-direction.first);
 
     assert(this->density > 0.0001f && this->density <= 1.f);
-    const coord_t min_spacing   = scale_(this->min_spacing);
-    coord_t line_spacing        = (double) min_spacing / this->density;
+    const coord_t min_spacing   = scale_(this->fill_spacing);
+    coord_t line_spacing        = min_spacing;
 
     // We ignore this->bounding_box because it doesn't matter; we're doing align_to_grid below.
     BoundingBox bounding_box    = expolygon.contour.bounding_box();
