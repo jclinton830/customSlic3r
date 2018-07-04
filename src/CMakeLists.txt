@@ -53,6 +53,7 @@ add_library(libslic3r STATIC
     ${LIBDIR}/libslic3r/Fill/FillHoneycomb.cpp
     ${LIBDIR}/libslic3r/Fill/FillPlanePath.cpp
     ${LIBDIR}/libslic3r/Fill/FillRectilinear.cpp
+    ${LIBDIR}/libslic3r/Fill/FillBioRectilinear.cpp
     ${LIBDIR}/libslic3r/Flow.cpp
     ${LIBDIR}/libslic3r/GCode.cpp
     ${LIBDIR}/libslic3r/GCode/CoolingBuffer.cpp
@@ -165,7 +166,7 @@ ENDIF(wxWidgets_FOUND)
 
 # Windows needs a compiled component for Boost.nowide
 IF (WIN32)
-    add_library(boost-nowide STATIC 
+    add_library(boost-nowide STATIC
         ${LIBDIR}/boost/nowide/iostream.cpp
     )
 

@@ -102,10 +102,10 @@ Layer::make_slices()
         }
         slices = union_ex(slices_p);
     }
-
+    
     this->slices.expolygons.clear();
     this->slices.expolygons.reserve(slices.size());
-
+    
     // prepare ordering points
     // While it's more computationally expensive, we use centroid()
     // instead of first_point() because it's [much more] deterministic
@@ -114,11 +114,11 @@ Layer::make_slices()
     ordering_points.reserve(slices.size());
     for (const ExPolygon &ex : slices)
         ordering_points.push_back(ex.contour.centroid());
-
+    
     // sort slices
     std::vector<Points::size_type> order;
     Slic3r::Geometry::chained_path(ordering_points, order);
-
+    
     // populate slices vector
     for (const Points::size_type &o : order)
         this->slices.expolygons.push_back(slices[o]);
@@ -165,23 +165,23 @@ Layer::make_perimeters()
     #ifdef SLIC3R_DEBUG
     printf("Making perimeters for layer %zu\n", this->id());
     #endif
-
+    
     // keep track of regions whose perimeters we have already generated
     std::set<size_t> done;
-
+    
     FOREACH_LAYERREGION(this, layerm) {
         size_t region_id = layerm - this->regions.begin();
         if (done.find(region_id) != done.end()) continue;
         done.insert(region_id);
         const PrintRegionConfig &config = (*layerm)->region()->config;
-
+        
         // find compatible regions
         LayerRegionPtrs layerms;
         layerms.push_back(*layerm);
         for (LayerRegionPtrs::const_iterator it = layerm + 1; it != this->regions.end(); ++it) {
             LayerRegion* other_layerm = *it;
             const PrintRegionConfig &other_config = other_layerm->region()->config;
-
+            
             if (config.perimeter_extruder   == other_config.perimeter_extruder
                 && config.perimeters        == other_config.perimeters
                 && config.perimeter_speed   == other_config.perimeter_speed
@@ -194,7 +194,7 @@ Layer::make_perimeters()
                 done.insert(it - this->regions.begin());
             }
         }
-
+        
         if (layerms.size() == 1) {  // optimization
             (*layerm)->fill_surfaces.surfaces.clear();
             (*layerm)->make_perimeters((*layerm)->slices, &(*layerm)->fill_surfaces);
@@ -206,7 +206,7 @@ Layer::make_perimeters()
                     slices[s->extra_perimeters].push_back(*s);
                 }
             }
-
+            
             // merge the surfaces assigned to each group
             SurfaceCollection new_slices;
             for (const auto &it : slices) {
@@ -217,11 +217,11 @@ Layer::make_perimeters()
                     new_slices.surfaces.push_back(s);
                 }
             }
-
+            
             // make perimeters
             SurfaceCollection fill_surfaces;
             (*layerm)->make_perimeters(new_slices, &fill_surfaces);
-
+            
             // assign fill_surfaces to each layer
             if (!fill_surfaces.surfaces.empty()) {
                 for (LayerRegionPtrs::iterator l = layerms.begin(); l != layerms.end(); ++l) {
@@ -230,7 +230,7 @@ Layer::make_perimeters()
                         (Polygons) (*l)->slices
                     );
                     (*l)->fill_surfaces.surfaces.clear();
-
+                    
                     for (ExPolygons::iterator ex = expp.begin(); ex != expp.end(); ++ex) {
                         Surface s = fill_surfaces.surfaces.front();  // clone type and extra_perimeters
                         s.expolygon = *ex;
@@ -250,10 +250,10 @@ Layer::make_fills()
     #ifdef SLIC3R_DEBUG
     printf("Making fills for layer %zu\n", this->id());
     #endif
-
+    
     FOREACH_LAYERREGION(this, it_layerm) {
         (*it_layerm)->make_fill();
-
+        
         #ifndef NDEBUG
         for (size_t i = 0; i < (*it_layerm)->fills.entities.size(); ++i)
             assert(dynamic_cast<ExtrusionEntityCollection*>((*it_layerm)->fills.entities[i]) != NULL);
@@ -274,19 +274,19 @@ void
 Layer::detect_surfaces_type()
 {
     PrintObject &object = *this->object();
-
+    
     for (size_t region_id = 0; region_id < this->regions.size(); ++region_id) {
         LayerRegion &layerm = *this->regions[region_id];
-
+        
         // comparison happens against the *full* slices (considering all regions)
         // unless internal shells are requested
-
+    
         // We call layer->slices or layerm->slices on these neighbor layers
         // and we convert them into Polygons so we only care about their total
         // coverage. We only write to layerm->slices so we can read layer->slices safely.
         Layer* const &upper_layer = this->upper_layer;
         Layer* const &lower_layer = this->lower_layer;
-
+    
         // collapse very narrow parts (using the safety offset in the diff is not enough)
         // TODO: this offset2 makes this method not idempotent (see #3764), so we should
         // move it to where we generate fill_surfaces instead and leave slices unaltered
@@ -306,7 +306,7 @@ Layer::detect_surfaces_type()
             } else {
                 upper_slices = upper_layer->slices;
             }
-
+        
             top.append(
                 offset2_ex(
                     diff(layerm_slices_surfaces, upper_slices, true),
@@ -320,7 +320,7 @@ Layer::detect_surfaces_type()
             top = layerm.slices;
             for (Surface &s : top.surfaces) s.surface_type = stTop;
         }
-
+    
         // find bottom surfaces (difference between current surfaces
         // of current layer and lower one)
         SurfaceCollection bottom;
@@ -331,7 +331,7 @@ Layer::detect_surfaces_type()
                 (object.config.support_material.value && object.config.support_material_contact_distance.value == 0)
                 ? stBottom
                 : stBottomBridge;
-
+        
             // Any surface lying on the void is a true bottom bridge (an overhang)
             bottom.append(
                 offset2_ex(
@@ -340,7 +340,7 @@ Layer::detect_surfaces_type()
                 ),
                 surface_type_bottom
             );
-
+        
             // if user requested internal shells, we need to identify surfaces
             // lying on other slices not belonging to this region
             if (object.config.interface_shells) {
@@ -364,7 +364,7 @@ Layer::detect_surfaces_type()
             // if no lower layer, all surfaces of this one are solid
             // we clone surfaces because we're going to clear the slices collection
             bottom = layerm.slices;
-
+        
             // if we have raft layers, consider bottom layer as a bridge
             // just like any other bottom surface lying on the void
             const SurfaceType surface_type_bottom =
@@ -373,7 +373,7 @@ Layer::detect_surfaces_type()
                 : stBottom;
             for (Surface &s : bottom.surfaces) s.surface_type = surface_type_bottom;
         }
-
+    
         // now, if the object contained a thin membrane, we could have overlapping bottom
         // and top surfaces; let's do an intersection to discover them and consider them
         // as bottom surfaces (to allow for bridge detection)
@@ -386,18 +386,18 @@ Layer::detect_surfaces_type()
                 stTop
             );
         }
-
+    
         // save surfaces to layer
         {
             boost::lock_guard<boost::mutex> l(layerm._slices_mutex);
             layerm.slices.clear();
             layerm.slices.append(STDMOVE(top));
             layerm.slices.append(STDMOVE(bottom));
-
+    
             // find internal surfaces (difference between top/bottom surfaces and others)
             {
                 Polygons topbottom = top; append_to(topbottom, (Polygons)bottom);
-
+    
                 layerm.slices.append(
                     // TODO: maybe we don't need offset2?
                     offset2_ex(
@@ -408,13 +408,13 @@ Layer::detect_surfaces_type()
                 );
             }
         }
-
+    
         #ifdef SLIC3R_DEBUG
         printf("  layer %zu has %zu bottom, %zu top and %zu internal surfaces\n",
             this->id(), bottom.size(), top.size(),
             layerm.slices.size()-bottom.size()-top.size());
         #endif
-
+    
         {
             /*  Fill in layerm->fill_surfaces by trimming the layerm->slices by the cummulative layerm->fill_surfaces.
                 Note: this method should be idempotent, but fill_surfaces gets modified

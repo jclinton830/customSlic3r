@@ -11,6 +11,7 @@
 #include "Fill/Fill.hpp"
 #include "PrintConfig.hpp"
 
+
 namespace Slic3r {
 
 typedef std::pair<coordf_t,coordf_t> t_layer_height_range;
@@ -84,11 +85,12 @@ class LayerRegion
     /// Mutex object for slices.
     mutable boost::mutex _slices_mutex;
 
-    ///Constructor
-    LayerRegion(Layer *layer, PrintRegion *region)
-        : _layer(layer), _region(region) {};
-    ///Destructor
-    ~LayerRegion() {};
+    public:
+      ///Constructor
+      LayerRegion(Layer *layer, PrintRegion *region)
+          : _layer(layer), _region(region) {};
+      ///Destructor
+      ~LayerRegion() {};
 };
 
 /// A std::vector of LayerRegion Pointers

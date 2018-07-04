@@ -10,7 +10,7 @@ Flow
 Flow::new_from_config_width(FlowRole role, const ConfigOptionFloatOrPercent &width, float nozzle_diameter, float height, float bridge_flow_ratio) {
     // we need layer height unless it's a bridge
     if (height <= 0 && bridge_flow_ratio == 0) CONFESS("Invalid flow height supplied to new_from_config_width()");
-    
+
     float w;
     if (bridge_flow_ratio > 0) {
         // if bridge flow was requested, calculate bridge width
@@ -22,7 +22,7 @@ Flow::new_from_config_width(FlowRole role, const ConfigOptionFloatOrPercent &wid
         // if user set a manual value, use it
         w = width.get_abs_value(height);
     }
-    
+
     return Flow(w, height, nozzle_diameter, bridge_flow_ratio > 0);
 }
 
@@ -37,17 +37,17 @@ Flow::new_from_spacing(float spacing, float nozzle_diameter, float height, bool 
     return Flow(w, height, nozzle_diameter, bridge);
 }
 
-/* This method returns the centerline spacing between two adjacent extrusions 
+/* This method returns the centerline spacing between two adjacent extrusions
    having the same extrusion width (and other properties). */
 float
 Flow::spacing() const {
     if (this->bridge) {
         return this->width + BRIDGE_EXTRA_SPACING;
     }
-    
     // rectangle with semicircles at the ends
     float min_flow_spacing = this->width - this->height * (1 - PI/4.0);
     return this->width - OVERLAP_FACTOR * (this->width - min_flow_spacing);
+
 }
 
 void
@@ -62,11 +62,11 @@ float
 Flow::spacing(const Flow &other) const {
     assert(this->height == other.height);
     assert(this->bridge == other.bridge);
-    
+
     if (this->bridge) {
         return this->width/2 + other.width/2 + BRIDGE_EXTRA_SPACING;
     }
-    
+
     return this->spacing()/2 + other.spacing()/2;
 }
 
@@ -76,7 +76,7 @@ Flow::mm3_per_mm() const {
     if (this->bridge) {
         return (this->width * this->width) * PI/4.0;
     }
-    
+
     // rectangle with semicircles at the ends
     return this->width * this->height + (this->height*this->height) / 4.0 * (PI-4.0);
 }
@@ -94,7 +94,7 @@ Flow::_auto_width(FlowRole role, float nozzle_diameter, float height) {
     // here we calculate a sane default by matching the flow speed (at the nozzle) and the feed rate
     // shape: rectangle with semicircles at the ends
     float width = ((nozzle_diameter*nozzle_diameter) * PI + (height*height) * (4.0 - PI)) / (4.0 * height);
-    
+
     float min = nozzle_diameter * 1.05;
     float max = nozzle_diameter * 1.25; // cap width to 1.25x nozzle diameter
     if (role == frExternalPerimeter || role == frSupportMaterial || role == frSupportMaterialInterface) {
@@ -105,7 +105,7 @@ Flow::_auto_width(FlowRole role, float nozzle_diameter, float height) {
     }
     if (width > max) width = max;
     if (width < min) width = min;
-    
+
     return width;
 }
 
@@ -115,14 +115,14 @@ Flow::_width_from_spacing(float spacing, float nozzle_diameter, float height, bo
     if (bridge) {
         return spacing - BRIDGE_EXTRA_SPACING;
     }
-    
+
     // rectangle with semicircles at the ends
     return spacing + OVERLAP_FACTOR * height * (1 - PI/4.0);
 }
 
 /// Calculate a new spacing to fill width with possibly integer number of lines,
 /// the first and last line being centered at the interval ends.
-/// This function possibly increases the spacing, never decreases, 
+/// This function possibly increases the spacing, never decreases,
 /// and for a narrow width the increase in spacing may become severe,
 /// therefore the adjustment is limited to 20% increase.
 template <class T>
@@ -133,24 +133,27 @@ Flow::solid_spacing(const T total_width, const T spacing)
     assert(spacing > 0);
     const int number_of_intervals = floor(total_width / spacing);
     if (number_of_intervals == 0) return spacing;
-    
+
     T spacing_new = (total_width / number_of_intervals);
-    
+
     const double factor = (double)spacing_new / (double)spacing;
     assert(factor > 1. - 1e-5);
-    
+
     // How much could the extrusion width be increased? By 20%.
     // Because of this limit, this method is not idempotent: each run
     // will increment spacing by 20%.
     const double factor_max = 1.2;
     if (factor > factor_max)
         spacing_new = floor((double)spacing * factor_max + 0.5);
-    
+
     assert((spacing_new * number_of_intervals) <= total_width);
-    
+
+    //noOfIntervals = number_of_intervals;
     return spacing_new;
 }
 template coord_t Flow::solid_spacing<coord_t>(const coord_t total_width, const coord_t spacing);
 template coordf_t Flow::solid_spacing<coordf_t>(const coordf_t total_width, const coordf_t spacing);
+
+
 
 }

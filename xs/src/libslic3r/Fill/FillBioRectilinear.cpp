@@ -12,12 +12,12 @@
 #include <algorithm>
 #include <cmath>
 
-#include "FillRectilinear.hpp"
+#include "FillBioRectilinear.hpp"
 
 namespace Slic3r {
 
 void
-FillRectilinear::_fill_single_direction(ExPolygon expolygon,
+FillBioRectilinear::_fill_single_direction(ExPolygon expolygon,
     const direction_t &direction, coord_t x_shift, Polylines* out)
 {
     // Remove almost collinear points (vertical ones might break this algorithm
@@ -448,7 +448,7 @@ FillRectilinear::_fill_single_direction(ExPolygon expolygon,
         it->rotate(direction.first);
 }
 
-void FillRectilinear::_fill_surface_single(
+void FillBioRectilinear::_fill_surface_single(
     unsigned int                    thickness_layers,
     const direction_t               &direction,
     ExPolygon                       &expolygon,
@@ -456,5 +456,6 @@ void FillRectilinear::_fill_surface_single(
 {
     this->_fill_single_direction(expolygon, direction, 0, out);
 }
+
 
 } // namespace Slic3r

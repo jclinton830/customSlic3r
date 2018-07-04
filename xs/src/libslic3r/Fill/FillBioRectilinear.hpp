@@ -24,5 +24,6 @@ protected:
 	void _fill_single_direction(ExPolygon expolygon, const direction_t &direction,
 	    coord_t x_shift, Polylines* out);
 };
-};
-#endif //slic3r_FillBioRectilinear_hpp_
+
+}
+#endif // slic3r_FillBIORectilinear_hpp_

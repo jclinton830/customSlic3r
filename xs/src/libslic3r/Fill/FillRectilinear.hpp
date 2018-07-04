@@ -17,10 +17,10 @@ public:
 protected:
 	virtual void _fill_surface_single(
 	    unsigned int                     thickness_layers,
-	    const direction_t               &direction, 
-	    ExPolygon                       &expolygon, 
+	    const direction_t               &direction,
+	    ExPolygon                       &expolygon,
 	    Polylines*                      polylines_out);
-    
+
 	void _fill_single_direction(ExPolygon expolygon, const direction_t &direction,
 	    coord_t x_shift, Polylines* out);
 };
@@ -47,11 +47,11 @@ public:
 protected:
 	// The grid fill will keep the angle constant between the layers,; see the implementation of Slic3r::Fill.
     virtual float _layer_angle(size_t idx) const { return 0.f; }
-	
+
 	virtual void _fill_surface_single(
 	    unsigned int                     thickness_layers,
-	    const std::pair<float, Point>   &direction, 
-	    ExPolygon                       &expolygon, 
+	    const std::pair<float, Point>   &direction,
+	    ExPolygon                       &expolygon,
 	    Polylines*                      polylines_out);
 };
 
@@ -65,11 +65,11 @@ public:
 protected:
 	// The grid fill will keep the angle constant between the layers,; see the implementation of Slic3r::Fill.
     virtual float _layer_angle(size_t idx) const { return 0.f; }
-	
+
 	virtual void _fill_surface_single(
 	    unsigned int                     thickness_layers,
-	    const std::pair<float, Point>   &direction, 
-	    ExPolygon                       &expolygon, 
+	    const std::pair<float, Point>   &direction,
+	    ExPolygon                       &expolygon,
 	    Polylines*                      polylines_out);
 };
 
@@ -83,11 +83,11 @@ public:
 protected:
 	// The grid fill will keep the angle constant between the layers,; see the implementation of Slic3r::Fill.
     virtual float _layer_angle(size_t idx) const { return 0.f; }
-	
+
 	virtual void _fill_surface_single(
 	    unsigned int                     thickness_layers,
-	    const std::pair<float, Point>   &direction, 
-	    ExPolygon                       &expolygon, 
+	    const std::pair<float, Point>   &direction,
+	    ExPolygon                       &expolygon,
 	    Polylines*                      polylines_out);
 };
 
@@ -101,11 +101,11 @@ public:
 protected:
 	// The grid fill will keep the angle constant between the layers,; see the implementation of Slic3r::Fill.
     virtual float _layer_angle(size_t idx) const { return 0.f; }
-	
+
 	virtual void _fill_surface_single(
 	    unsigned int                     thickness_layers,
-	    const std::pair<float, Point>   &direction, 
-	    ExPolygon                       &expolygon, 
+	    const std::pair<float, Point>   &direction,
+	    ExPolygon                       &expolygon,
 	    Polylines*                      polylines_out);
 };
 

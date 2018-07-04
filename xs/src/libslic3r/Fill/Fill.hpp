@@ -98,6 +98,7 @@ protected:
         link_max_length(0),
         loop_clipping(0),
         density(0),
+        fill_spacing(0),
         dont_connect(false),
         dont_adjust(false),
         complete(false),

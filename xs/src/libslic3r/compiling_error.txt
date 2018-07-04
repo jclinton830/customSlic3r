@@ -1,0 +1,6 @@
+In file included from C:\Development\Slic3r\xs\src\libslic3r\PrintConfig.hpp:21:0,
+                 from C:\Development\Slic3r\xs\src\libslic3r\PrintConfig.cpp:1:
+C:\Development\Slic3r\xs\src\libslic3r\libslic3r.h:11:28: fatal error: boost/thread.hpp: No such file or directory
+ #include <boost/thread.hpp>
+                            ^
+compilation terminated.
